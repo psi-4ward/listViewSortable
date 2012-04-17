@@ -11,8 +11,10 @@ class ListViewSortable extends System
 {
 	public function injectJavascript($table)
 	{
-		if($GLOBALS['TL_DCA'][$table]['list']['sorting']['listViewSortable'] && !$this->Input->get('act'))
+
+		if($GLOBALS['TL_DCA'][$table]['list']['sorting']['listViewSortable'] && !$this->Input->get('act') && !isset($GLOBALS['listViewSortable_inserted']))
 		{
+
 			$GLOBALS['TL_DCA'][$table]['list']['sorting']['flag'] = 7;
 			$GLOBALS['TL_DCA'][$table]['list']['sorting']['mode'] = 1;
 			$GLOBALS['TL_DCA'][$table]['list']['sorting']['disableGrouping'] = true;
@@ -20,6 +22,10 @@ class ListViewSortable extends System
 
 			$GLOBALS['TL_JAVASCRIPT'][] = 'system/modules/listViewSortable/html/listViewSortable.js';
 		}
+
+		// we save the first call of this function, cause this is the "main" table
+		// later on, if a child or parent table gets loaded we dont want to include the scripts
+		$GLOBALS['listViewSortable_inserted'] = true;
 	}
 
 	public function resort($strAction, DataContainer $dc)
