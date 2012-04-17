@@ -11,7 +11,7 @@ class ListViewSortable extends System
 {
 	public function injectJavascript($table)
 	{
-		if($GLOBALS['TL_DCA'][$table]['list']['sorting']['listViewSortable'])
+		if($GLOBALS['TL_DCA'][$table]['list']['sorting']['listViewSortable'] && !$this->Input->get('act'))
 		{
 			$GLOBALS['TL_DCA'][$table]['list']['sorting']['flag'] = 7;
 			$GLOBALS['TL_DCA'][$table]['list']['sorting']['mode'] = 1;
