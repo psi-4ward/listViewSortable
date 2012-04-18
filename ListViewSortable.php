@@ -30,7 +30,26 @@ class ListViewSortable extends System
 
 	public function resort($strAction, DataContainer $dc)
 	{
-		print_r($dc->table);
+		$table = $dc->table;
+
+		if($this->Input->post('table'))
+		{
+			// check if this table belongs to current module
+			foreach($GLOBALS['BE_MOD'] as $category)
+			{
+				foreach($category as $module => $data)
+				{
+					if($module == $this->Input->get('do'))
+					{
+						if(in_array($this->Input->post('table'),$data['tables']))
+						{
+							$table = $this->Input->post('table');
+						}
+						break 2;
+					}
+				}
+			}
+		}
 
 	    if ($strAction == 'listViewSortable')
 	    {
@@ -44,7 +63,7 @@ class ListViewSortable extends System
 			// ID is set (insert after the current record)
 			if ($this->Input->post('afterid'))
 			{
-				$objCurrentRecord = $this->Database->prepare("SELECT * FROM " . $dc->table . " WHERE id=?")
+				$objCurrentRecord = $this->Database->prepare("SELECT * FROM " . $table . " WHERE id=?")
 												   ->limit(1)
 												   ->executeUncached($this->Input->post('afterid'));
 
@@ -53,7 +72,7 @@ class ListViewSortable extends System
 				{
 					$curSorting = $objCurrentRecord->sorting;
 
-					$objNextSorting = $this->Database->prepare("SELECT MIN(sorting) AS sorting FROM " . $dc->table . " WHERE sorting>?")
+					$objNextSorting = $this->Database->prepare("SELECT MIN(sorting) AS sorting FROM " . $table . " WHERE sorting>?")
 													 ->executeUncached($curSorting);
 
 					// Select sorting value of the next record
@@ -66,11 +85,11 @@ class ListViewSortable extends System
 						{
 							$count = 1;
 
-							$objNewSorting = $this->Database->executeUncached("SELECT id, sorting FROM " . $dc->table . " ORDER BY sorting");
+							$objNewSorting = $this->Database->executeUncached("SELECT id, sorting FROM " . $table . " ORDER BY sorting");
 
 							while ($objNewSorting->next())
 							{
-								$qry = $this->Database->prepare("UPDATE " . $dc->table . " SET sorting=? WHERE id=?")
+								$qry = $this->Database->prepare("UPDATE " . $table . " SET sorting=? WHERE id=?")
 											   ->execute(($count++*128), $objNewSorting->id);
 								if ($objNewSorting->sorting == $curSorting)
 								{
@@ -87,18 +106,18 @@ class ListViewSortable extends System
 					else $newSorting = ($curSorting + 128);
 
 					// Set new sorting
-					$qry = $this->Database->prepare("UPDATE " . $dc->table . " SET sorting=? WHERE id=?")
+					$qry = $this->Database->prepare("UPDATE " . $table . " SET sorting=? WHERE id=?")
 								->execute($newSorting,$this->Input->post('id'));
 				}
 
 				// ID is not set (insert at the end)
 				else
 				{
-					$objNextSorting = $this->Database->executeUncached("SELECT MAX(sorting) AS sorting FROM " . $this->table);
+					$objNextSorting = $this->Database->executeUncached("SELECT MAX(sorting) AS sorting FROM " . $table);
 
 					if ($objNextSorting->numRows)
 					{
-						$qry = $this->Database->prepare("UPDATE " . $dc->table . " SET sorting=? WHERE id=?")
+						$qry = $this->Database->prepare("UPDATE " . $table . " SET sorting=? WHERE id=?")
 										->execute(intval($objNextSorting->sorting + 128),$this->Input->post('id'));
 					}
 				}
