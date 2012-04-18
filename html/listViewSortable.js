@@ -7,6 +7,13 @@ window.addEvent('domready', function ()
 {
 
 	var container = $$('table.tl_listing tbody')[0];
+
+	// just return if theres no container (ie "no elements")
+	if(!container) return;
+
+	// also return if theres only one element
+	if(container.getElements('td:first-child').length <= 1) return;
+
 	container.getElements('td:first-child').setStyle('cursor', 'move');
 
 	var list = new Sortables($$('table.tl_listing tbody'), {
