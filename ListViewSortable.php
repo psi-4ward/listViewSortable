@@ -30,6 +30,7 @@ class ListViewSortable extends System
 
 	public function resort($strAction, DataContainer $dc)
 	{
+		print_r($dc->table);
 
 	    if ($strAction == 'listViewSortable')
 	    {
@@ -93,7 +94,7 @@ class ListViewSortable extends System
 				// ID is not set (insert at the end)
 				else
 				{
-					$objNextSorting = $this->Database->executeUncached("SELECT MAX(sorting) AS sorting FROM " . $this->strTable);
+					$objNextSorting = $this->Database->executeUncached("SELECT MAX(sorting) AS sorting FROM " . $this->table);
 
 					if ($objNextSorting->numRows)
 					{
